@@ -30,7 +30,7 @@ from transformers import (TrainingArguments, AutoModelForSequenceClassification,
 
 from src.adaptive_batch_trainer import AdaptiveBatchSizeTrainer
 """" 
-Test code for adaptive batch size training based on huggingface's trainer and sampler.
+Test code for adaptive batch size training with huggingface trainer.
 
 Sample run commands are:
 
