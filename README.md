@@ -40,6 +40,50 @@ nvidia-nvtx-cu12         12.4.127
 
 ## :rocket: Quickstart
 
+### Using the trainer
+
+You need only to define a callable implementing the batch size scheduler and pass it as an argument to the trainer:
+
+```python
+#   < ------- Write your own batch size scheduler ------- >
+def custom_batch_size_scheduler(step: int,
+                                batch_size: int,
+                                interval=5,
+                                increment=1):
+    """
+        step: current optimization step to be provided by the trainer.
+        batch_size: current optimization step  to be provided by the trainer.
+    """
+
+    if step % interval == 0 and step > 0:
+        return batch_size + increment
+    return batch_size
+
+
+# Extended trainer using the adaptive batch sampler.
+trainer = AdaptiveBatchSizeTrainer(
+    batch_size_scheduler=partial(custom_batch_size_scheduler,
+                                 interval=5,
+                                 increment=1),
+    model=model,
+    args=training_args,
+    train_dataset=dataset,
+    data_collator=collate_fn,
+)
+```
+`AdaptiveBatchSizeTrainer`  inherits from the Trainer and TrainingArguments. You can fine the full list of training arguments for running your script [here]([https://www.google.com](https://huggingface.co/docs/transformers/v4.49.0/en/main_classes/trainer#transformers.TrainingArguments)).
+
+> [!IMPORTANT]
+> The repo currently controls the optimization length exclusively via the argument `num_train_epochs`. This corresponds to the number of times the training dataset will be parsed by the model. Note that the number of optimization steps might not be known a priori if your batch size scheduler works online. To avoid overriding `Trainer`'s `_inner_training_loop` and maintain consistency, `max_steps` should be set to -1.
+>
+
+### Understanding the logs
+`AdaptiveBatchSizeTrainer` extends and revises `Trainer`'s training logs to account for the varying length of each epoch:
+
+* `train_coverage`: percent of train examples seen so far in the current epoch. Note that this might not increase linearly depending on the batch size scheduler you use.
+* `epoch`: it is now updated not given the optimization steps performed so far but based on the percent of train examples seen in total up to the current optimization step. This is equivalent to summing `train_coverage` across epochs.
+
+
 ##  :monocle_face: Demo
 
 ##  :nerd_face: Solution Outline
