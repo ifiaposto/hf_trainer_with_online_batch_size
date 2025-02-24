@@ -226,10 +226,30 @@ python -m torch.distributed.run --nproc-per-node=2 --master_port=29619 -m test_r
 ##  :nerd_face: Solution Outline
 
 ### Challenges
+:bulb: I preferred a minimally intrusive extension of hf `Trainer`. Therefore, I rely on callbacks for resetting the batch size and determining training termination  rather than overriding existing methods to support the functionality. 
+
+:bulb: The extension supports *per-step* and not *per-epoch* batch size adaptation for better flexibility. Therefore, the length of the `DataLoader` is not a priori known at the beginning of the epoch.
+
+:bulb: Due to the varying length of `DataLoader`, the logs and callbacks should be carefully handled and/or redefined.
+
+:bulb: Batch prefetching should be currently disabled to make sure the batch size is synchronously updated.
 
 ### Main Components
 
+:pushpin: `AdaptiveBatchSampler` inherits from pytorch's `BatchSampler`. It overrides its iterator and adds a method for updating the batch size.
+
+:pushpin: `AdaptiveBatchSizeDataLoader` inherits from pytorch's `DataLoader`. It wraps `AdaptiveBatchSampler` and adds a `set_epoch` method for  restarting the seed of the sampler at the beginning of each epoch.
+
+:pushpin: `AdaptiveBatchSizeTrainer` inherits from hugging face's `Trainer`. It:
+   * uses `AdaptiveBatchSizeDataLoader` and handles distributed data-parallel training.
+   * calls callbacks for the batch size scheduler.
+   * handles the revised/ extended logs.
+
 ### Future Optimizations
+
+:x: Support `transformers` version >= 4.45.2.
+
+:x: Make it compatible with `accelerate` or support *preemptive* prefetching. Currently `accelerate` by default prefetches one batch ahead.
 
 ## :books: References
 
