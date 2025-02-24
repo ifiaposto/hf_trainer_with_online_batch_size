@@ -71,7 +71,7 @@ trainer = AdaptiveBatchSizeTrainer(
     data_collator=collate_fn,
 )
 ```
-`AdaptiveBatchSizeTrainer`  inherits from the Trainer and TrainingArguments. You can fine the full list of training arguments for running your script [here]([https://www.google.com](https://huggingface.co/docs/transformers/v4.49.0/en/main_classes/trainer#transformers.TrainingArguments)).
+`AdaptiveBatchSizeTrainer`  inherits from the Trainer and `TrainingArguments`. You can fine the full list of training arguments for running your script [here]([https://www.google.com](https://huggingface.co/docs/transformers/v4.49.0/en/main_classes/trainer#transformers.TrainingArguments)).
 
 > [!IMPORTANT]
 > The repo currently controls the optimization length exclusively via the argument `num_train_epochs`. This corresponds to the number of times the training dataset will be parsed by the model. Note that the number of optimization steps might not be known a priori if your batch size scheduler works online. To avoid overriding `Trainer`'s `_inner_training_loop` and maintain consistency, `max_steps` should be set to -1.
@@ -236,11 +236,11 @@ python -m torch.distributed.run --nproc-per-node=2 --master_port=29619 -m test_r
 
 ### Main Components
 
-:pushpin: `AdaptiveBatchSampler` inherits from pytorch's `BatchSampler`. It overrides its iterator and adds a method for updating the batch size.
+:pushpin: `AdaptiveBatchSampler` inherits from PyTorch's `BatchSampler`. It overrides its iterator and adds a method for updating the batch size.
 
-:pushpin: `AdaptiveBatchSizeDataLoader` inherits from pytorch's `DataLoader`. It wraps `AdaptiveBatchSampler` and adds a `set_epoch` method for  restarting the seed of the sampler at the beginning of each epoch.
+:pushpin: `AdaptiveBatchSizeDataLoader` inherits from PyTorch's `DataLoader`. It wraps `AdaptiveBatchSampler` and adds a `set_epoch` method for  restarting the seed of the sampler at the beginning of each epoch.
 
-:pushpin: `AdaptiveBatchSizeTrainer` inherits from hugging face's `Trainer`. It:
+:pushpin: `AdaptiveBatchSizeTrainer` inherits from Hugging Face's `Trainer`. It:
    * uses `AdaptiveBatchSizeDataLoader` and handles distributed data-parallel training.
    * calls callbacks for the batch size scheduler.
    * handles the revised/ extended logs.
