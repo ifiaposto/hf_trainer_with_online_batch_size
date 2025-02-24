@@ -100,7 +100,7 @@ trainer = AdaptiveBatchSizeTrainer(
 
 [5] Wu, T., Luo, L., Li, Y.F., Pan, S., Vu, T.T. and Haffari, G., 2024. Continual learning for large language models: A survey. arXiv preprint arXiv:2402.01364.
 
-## :bouquet: Buy Me Flowers (Cite This Work)
+## :bouquet: Buy Me Flowers (Citation)
 
 If you use this repo in your research, please cite using the following BibTeX entry:
 
