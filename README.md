@@ -88,6 +88,12 @@ trainer = AdaptiveBatchSizeTrainer(
 
 ##  :nerd_face: Solution Outline
 
+### Challenges
+
+### Main Components
+
+### Future Optimizations
+
 ## :books: References
 
 [1] Devarakonda, A., Naumov, M. and Garland, M., 2017. Adabatch: Adaptive batch sizes for training deep neural networks. arXiv preprint arXiv:1712.02029.
