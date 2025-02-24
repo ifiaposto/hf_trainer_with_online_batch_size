@@ -35,4 +35,17 @@ Training with batch sizes that can adapt on-the-fly has been shown to be benefic
 
 ## :bouquet: Buy Me Flowers (Cite This Work)
 
+If you use this repo in your research, please cite using the following BibTeX entry:
+
+```
+@software{adaptive_batch_size_hf_trainer,
+title={Online Batch Size Adaptation in Hugging Face Trainer},
+author={Apostolopoulou, Ifigeneia},
+howpublished = {\url{https://github.com/ifiaposto/hf_trainer_with_online_batch_size}},
+year={2025},
+}
+
+```
+
+
 
