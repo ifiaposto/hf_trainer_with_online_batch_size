@@ -155,7 +155,7 @@ python -m torch.distributed.run --nproc-per-node=2 --master_port=29619 -m test_r
 * we notice every 5 steps (epoch 1.4, 3.6 etc) the local batch size increases by one and according to the scheduler.
 * since dataloader_drop_last= False when train_coverage=1.0 the true batch size might be different than the scheduler's batch size.
   
-   <details><summary>output for multi-gpu, use the last batch.   </summary>
+   <details><summary>output for multi-gpu, with the last batch included.   </summary>
   
   ```
   compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 1,  indices tensor([1], device='cuda:1')                                                                                  
