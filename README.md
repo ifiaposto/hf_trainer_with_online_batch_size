@@ -80,8 +80,8 @@ trainer = AdaptiveBatchSizeTrainer(
 ### Understanding the logs
 `AdaptiveBatchSizeTrainer` extends and revises `Trainer`'s training logs to account for the varying length of each epoch:
 
-* `train_coverage`: percent of train examples seen so far in the current epoch. Note that this might not increase linearly depending on the batch size scheduler you use.
-* `epoch`: it is now updated not given the optimization steps performed so far but based on the percent of train examples seen in total up to the current optimization step. This is equivalent to summing `train_coverage` across epochs.
+* `train_coverage`: It refers to the percent of train examples seen so far in the current epoch. Note that this might not increase linearly depending on the batch size scheduler you use.
+* `epoch`: It is now updated not given the optimization steps performed so far but based on the percent of train examples seen in total up to the current optimization step. This is equivalent to summing `train_coverage` across epochs.
 
 
 ##  :monocle_face: Demo
