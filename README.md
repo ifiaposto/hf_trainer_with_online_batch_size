@@ -86,6 +86,143 @@ trainer = AdaptiveBatchSizeTrainer(
 
 ##  :monocle_face: Demo
 
+Below are some sample run commands for our test code using different configurations of single/multi-gpu training and `dataloader_drop_last` (which ignores the last batch when there aren't sufficient training examples left). We inspect the output for the last one.
+
+ <details><summary>single-gpu, ignore the last batch.   </summary>
+ 
+```
+python -m torch.distributed.run --nproc-per-node=1 --master_port=29619 -m test_replay_dataloader \
+    --output_dir ./results \
+    --logging_dir ./logs \
+    --logging_steps 1 \
+    --save_strategy no \
+    --num_train_epochs 10 \
+    --per_device_train_batch_size 1 \
+    --max_steps -1 \
+    --dataloader_drop_last
+```  
+</details>
+
+ <details><summary>multi-gpu, ignore the last batch.   </summary>
+ 
+```
+python -m torch.distributed.run --nproc-per-node=2 --master_port=29619 -m test_replay_dataloader \
+    --output_dir ./results \
+    --logging_dir ./logs \
+    --logging_steps 1 \
+    --save_strategy no \
+    --num_train_epochs 10 \
+    --per_device_train_batch_size 1 \
+    --max_steps -1 \
+    --dataloader_drop_last
+```  
+</details>
+
+</details>
+
+<details><summary>single-gpu, use the last batch.   </summary>
+ 
+```
+python -m torch.distributed.run --nproc-per-node=1 --master_port=29619 -m test_replay_dataloader \
+    --output_dir ./results \
+    --logging_dir ./logs \
+    --logging_steps 1 \
+    --save_strategy no \
+    --num_train_epochs 10 \
+    --per_device_train_batch_size 1 \
+    --max_steps -1 \
+    --dataloader_drop_last False
+    
+```  
+</details>
+
+<details><summary>multi-gpu, use the last batch.   </summary>
+ 
+```
+python -m torch.distributed.run --nproc-per-node=2 --master_port=29619 -m test_replay_dataloader \
+    --output_dir ./results \
+    --logging_dir ./logs \
+    --logging_steps 1 \
+    --save_strategy no \
+    --num_train_epochs 10 \
+    --per_device_train_batch_size 1 \
+    --max_steps -1 \
+    --dataloader_drop_last False
+    
+```  
+</details>
+
+* we notice every 5 steps (epoch 1.4, 3.6 etc) the local batch size increases by one and according to the scheduler.
+* since dataloader_drop_last= False when train_coverage=1.0 the true batch size might be different than the scheduler's batch size.
+  
+   <details><summary>output for multi-gpu, use the last batch.   </summary>
+  
+  ```
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 1,  indices tensor([1], device='cuda:1')                                                                                  
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 0) local batch size 1,  indices tensor([4], device='cuda:0')                                                                                  
+  [rank0]:[W224 16:51:33.619610762 reducer.cpp:1400] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters in the forward pass. This flag results in $
+  n extra traversal of the autograd graph every iteration,  which can adversely affect performance. If your model indeed never has any unused parameters in the forward pass, consider turning this flag off. 
+  Note that this warning may be a false positive if your model has flow control causing later iterations to have unused parameters. (function operator())                                                     
+  [rank1]:[W224 16:51:33.629522783 reducer.cpp:1400] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters in the forward pass. This flag results in $
+  n extra traversal of the autograd graph every iteration,  which can adversely affect performance. If your model indeed never has any unused parameters in the forward pass, consider turning this flag off. 
+  Note that this warning may be a false positive if your model has flow control causing later iterations to have unused parameters. (function operator())                                                     
+  {'loss': 0.5852, 'grad_norm': 11.941976547241211, 'learning_rate': 4.9500000000000004e-05, 'train coverage': 0.2, 'epoch': 0.2}                                                                             
+    1%|█▋                                                                                                                                                                     | 1/100 [00:00<00:52,  1.90it/s$
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 0) local batch size 1,  indices tensor([7], device='cuda:0')                                                                                  
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 1,  indices tensor([5], device='cuda:1')                                                                                  
+  {'loss': 0.7744, 'grad_norm': 7.989934921264648, 'learning_rate': 4.9e-05, 'train coverage': 0.4, 'epoch': 0.4}                                                                                             
+    2%|███▎                                                                                                                                                                   | 2/100 [00:00<00:28,  3.38it/s$
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 0) local batch size 1,  indices tensor([3], device='cuda:0')                                                                                  
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 1,  indices tensor([9], device='cuda:1')                                                                                  
+  {'loss': 0.6889, 'grad_norm': 3.215988874435425, 'learning_rate': 4.85e-05, 'train coverage': 0.6, 'epoch': 0.6}                                                                                            
+    3%|█████                                                                                                                                                                  | 3/100 [00:00<00:23,  4.18it/s$
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 0) local batch size 1,  indices tensor([0], device='cuda:0')                                                                                  
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 1,  indices tensor([8], device='cuda:1')                                                                                  
+  {'loss': 0.7219, 'grad_norm': 5.315413475036621, 'learning_rate': 4.8e-05, 'train coverage': 0.8, 'epoch': 0.8}                                                                                             
+    4%|██████▋                                                                                                                                                                | 4/100 [00:01<00:20,  4.73it/s$
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 1,  indices tensor([2], device='cuda:1')                                                                                  
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 0) local batch size 1,  indices tensor([6], device='cuda:0')                                                                                  
+  {'loss': 0.7349, 'grad_norm': 9.186591148376465, 'learning_rate': 4.75e-05, 'train coverage': 1.0, 'epoch': 1.0}                                                                                            
+    5%|████████▎                                                                                                                                                              | 5/100 [00:01<00:17,  5.46it/s$
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 2,  indices tensor([6, 2], device='cuda:1')                                                                               
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 0) local batch size 2,  indices tensor([5, 1], device='cuda:0')                                                                               
+  {'loss': 0.6667, 'grad_norm': 7.5692901611328125, 'learning_rate': 4.7e-05, 'train coverage': 0.4, 'epoch': 1.4}                                                                                            
+    6%|██████████                                                                                                                                                             | 6/100 [00:01<00:14,  6.41it/s$
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 2,  indices tensor([8, 3], device='cuda:1')                                                                               
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 0) local batch size 2,  indices tensor([0, 9], device='cuda:0')                                                                               
+  {'loss': 0.6908, 'grad_norm': 1.293290615081787, 'learning_rate': 4.6500000000000005e-05, 'train coverage': 0.8, 'epoch': 1.8}                                                                              
+    7%|███████████▋                                                                                                                                                           | 7/100 [00:01<00:14,  6.41it/s$
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 0) local batch size 1,  indices tensor([7], device='cuda:0')
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 1,  indices tensor([4], device='cuda:1')
+  {'loss': 0.6941, 'grad_norm': 0.7848922610282898, 'learning_rate': 4.600000000000001e-05, 'train coverage': 1.0, 'epoch': 2.0}
+    8%|█████████████▎                                                                                                                                                         | 8/100 [00:01<00:11,  8.29it/s$
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 0) local batch size 2,  indices tensor([8, 1], device='cuda:0')
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 2,  indices tensor([7, 5], device='cuda:1')
+  {'loss': 0.6856, 'grad_norm': 9.592278480529785, 'learning_rate': 4.55e-05, 'train coverage': 0.4, 'epoch': 2.4}
+    9%|███████████████                                                                                                                                                        | 9/100 [00:01<00:11,  7.86it/s$
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 0) local batch size 2,  indices tensor([6, 0], device='cuda:0')
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 2,  indices tensor([9, 4], device='cuda:1')
+  {'loss': 0.6908, 'grad_norm': 0.9208756685256958, 'learning_rate': 4.5e-05, 'train coverage': 0.8, 'epoch': 2.8}
+   10%|████████████████▌                                                                                                                                                     | 10/100 [00:01<00:11,  7.94it/s$
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 0) local batch size 1,  indices tensor([2], device='cuda:0')
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 1,  indices tensor([3], device='cuda:1')
+  {'loss': 0.7796, 'grad_norm': 20.710803985595703, 'learning_rate': 4.4500000000000004e-05, 'train coverage': 1.0, 'epoch': 3.0}
+   11%|██████████████████▎                                                                                                                                                   | 11/100 [00:01<00:10,  8.41it/s]
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 0) local batch size 3,  indices tensor([6, 3, 8], device='cuda:0')
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 3,  indices tensor([0, 7, 5], device='cuda:1')
+  {'loss': 0.5507, 'grad_norm': 9.137839317321777, 'learning_rate': 4.4000000000000006e-05, 'train coverage': 0.6, 'epoch': 3.6}
+   12%|███████████████████▉                                                                                                                                                  | 12/100 [00:01<00:10,  8.41it/s]
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 2,  indices tensor([9, 4], device='cuda:1')
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 0) local batch size 2,  indices tensor([1, 2], device='cuda:0')
+  {'loss': 0.8429, 'grad_norm': 9.582053184509277, 'learning_rate': 4.35e-05, 'train coverage': 1.0, 'epoch': 4.0}
+   13%|█████████████████████▌                                                                                                                                                | 13/100 [00:01<00:09,  9.06it/s]
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 0) local batch size 3,  indices tensor([0, 9, 7], device='cuda:0')
+  compute loss Current GPU device: Tesla V100-SXM2-32GB (Device 1) local batch size 3,  indices tensor([4, 6, 3], device='cuda:1')
+  {'loss': 0.7207, 'grad_norm': 5.453138828277588, 'learning_rate': 4.3e-05, 'train coverage': 0.6, 'epoch': 4.6}
+  
+  ```
+  </details>
+
 ##  :nerd_face: Solution Outline
 
 ### Challenges
