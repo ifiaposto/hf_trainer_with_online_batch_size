@@ -71,7 +71,7 @@ trainer = AdaptiveBatchSizeTrainer(
     data_collator=collate_fn,
 )
 ```
-`AdaptiveBatchSizeTrainer`  inherits from the Trainer and `TrainingArguments`. You can fine the full list of training arguments for running your script [here]([https://www.google.com](https://huggingface.co/docs/transformers/v4.49.0/en/main_classes/trainer#transformers.TrainingArguments)).
+`AdaptiveBatchSizeTrainer`  inherits from the `Trainer` and `TrainingArguments`. You can find the full list of training arguments for running your script [here]([https://www.google.com](https://huggingface.co/docs/transformers/v4.49.0/en/main_classes/trainer#transformers.TrainingArguments)).
 
 > [!IMPORTANT]
 > The repo currently controls the optimization length exclusively via the argument `num_train_epochs`. This corresponds to the number of times the training dataset will be parsed by the model. Note that the number of optimization steps might not be known a priori if your batch size scheduler works online. To avoid overriding `Trainer`'s `_inner_training_loop` and maintain consistency, `max_steps` should be set to -1.
