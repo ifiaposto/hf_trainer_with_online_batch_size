@@ -91,7 +91,7 @@ Below are some sample run commands for our test code using different configurati
  <details><summary>single-gpu, ignore the last batch.   </summary>
  
 ```
-python -m torch.distributed.run --nproc-per-node=1 --master_port=29619 -m test_replay_dataloader \
+python -m torch.distributed.run --nproc-per-node=1 --master_port=29619 -m test_adaptive_dataloader \
     --output_dir ./results \
     --logging_dir ./logs \
     --logging_steps 1 \
@@ -106,7 +106,7 @@ python -m torch.distributed.run --nproc-per-node=1 --master_port=29619 -m test_r
  <details><summary>multi-gpu, ignore the last batch.   </summary>
  
 ```
-python -m torch.distributed.run --nproc-per-node=2 --master_port=29619 -m test_replay_dataloader \
+python -m torch.distributed.run --nproc-per-node=2 --master_port=29619 -m test_adaptive_dataloader \
     --output_dir ./results \
     --logging_dir ./logs \
     --logging_steps 1 \
@@ -123,7 +123,7 @@ python -m torch.distributed.run --nproc-per-node=2 --master_port=29619 -m test_r
 <details><summary>single-gpu, use the last batch.   </summary>
  
 ```
-python -m torch.distributed.run --nproc-per-node=1 --master_port=29619 -m test_replay_dataloader \
+python -m torch.distributed.run --nproc-per-node=1 --master_port=29619 -m test_adaptive_dataloader \
     --output_dir ./results \
     --logging_dir ./logs \
     --logging_steps 1 \
@@ -139,7 +139,7 @@ python -m torch.distributed.run --nproc-per-node=1 --master_port=29619 -m test_r
 <details><summary>multi-gpu, use the last batch.   </summary>
  
 ```
-python -m torch.distributed.run --nproc-per-node=2 --master_port=29619 -m test_replay_dataloader \
+python -m torch.distributed.run --nproc-per-node=2 --master_port=29619 -m test_adaptive_dataloader \
     --output_dir ./results \
     --logging_dir ./logs \
     --logging_steps 1 \
